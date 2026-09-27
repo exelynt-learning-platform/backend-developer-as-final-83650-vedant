@@ -7,6 +7,7 @@ import com.resourcebooking.entity.Resource;
 import com.resourcebooking.entity.User;
 import com.resourcebooking.enums.ReservationStatus;
 import com.resourcebooking.exception.AccessDeniedCustomException;
+import com.resourcebooking.exception.ConflictException;
 import com.resourcebooking.exception.ResourceNotFoundException;
 import com.resourcebooking.repository.ReservationRepository;
 import com.resourcebooking.repository.ReservationSpecification;
@@ -48,7 +49,9 @@ public class ReservationService {
         ).isEmpty();
 
         if (overlaps) {
-            throw new IllegalArgumentException("This resource is already booked for the requested time slot");
+            // 409, not 400 - the request itself is well-formed, it just conflicts with an
+            // existing booking
+            throw new ConflictException("This resource is already booked for the requested time slot");
         }
 
         Reservation reservation = new Reservation();

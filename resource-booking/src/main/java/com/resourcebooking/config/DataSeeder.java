@@ -6,12 +6,17 @@ import com.resourcebooking.enums.Role;
 import com.resourcebooking.repository.ResourceRepository;
 import com.resourcebooking.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 // runs once when the app starts up, just inserts a couple of test users + resources
-// so I don't have to manually insert rows every time I reset the db while testing
+// so I don't have to manually insert rows every time I reset the db while testing.
+// @Profile("!prod") means this whole thing is skipped when you run with
+// SPRING_PROFILES_ACTIVE=prod - don't want test accounts with known passwords seeded
+// into a real deployment
 @Component
+@Profile("!prod")
 public class DataSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;

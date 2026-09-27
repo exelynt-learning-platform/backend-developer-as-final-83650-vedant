@@ -10,6 +10,7 @@ import com.resourcebooking.service.ReservationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,7 +34,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponse> create(@Valid @RequestBody ReservationRequest request,
                                                         @AuthenticationPrincipal User currentUser) {
-        return ResponseEntity.ok(reservationService.create(request, currentUser));
+        return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.create(request, currentUser));
     }
 
     // GET /api/reservations?status=PENDING&minPrice=10&maxPrice=100&page=0&size=10&sortBy=createdAt&sortDir=desc

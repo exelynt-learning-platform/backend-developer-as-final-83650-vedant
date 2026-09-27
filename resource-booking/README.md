@@ -118,8 +118,17 @@ of the requests.
 5. Filtering/pagination example (admin):
    `GET /api/reservations?status=PENDING&minPrice=100&maxPrice=1000&page=0&size=5&sortBy=price&sortDir=asc`
 
-## Notes / things I'd improve with more time
+## Notes
 
-- Right now there's no check for overlapping bookings on the same resource/time slot
+- Booking a resource for a time slot that overlaps an existing (non-cancelled) reservation
+  on the same resource is rejected with a 409.
+- The seed data (`admin`/`john`/`mary` + sample resources) only runs when the `prod` profile
+  is **not** active. To disable it, run with `SPRING_PROFILES_ACTIVE=prod` (you'd obviously
+  want your own real users at that point, not test accounts with known passwords).
+
+## Things I'd improve with more time
+
 - No refresh token, just a single long-lived access token for simplicity
 - Could add rate limiting on `/auth/login`
+- No automated tests yet (would add MockMvc/@SpringBootTest tests for auth, RBAC, ownership,
+  filtering/pagination, and the overlap check)

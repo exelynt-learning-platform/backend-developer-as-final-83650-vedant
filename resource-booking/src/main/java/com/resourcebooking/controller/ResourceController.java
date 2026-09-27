@@ -5,6 +5,7 @@ import com.resourcebooking.dto.ResourceResponse;
 import com.resourcebooking.service.ResourceService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class ResourceController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResourceResponse> create(@Valid @RequestBody ResourceRequest request) {
-        return ResponseEntity.ok(resourceService.create(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(resourceService.create(request));
     }
 
     @PutMapping("/{id}")
