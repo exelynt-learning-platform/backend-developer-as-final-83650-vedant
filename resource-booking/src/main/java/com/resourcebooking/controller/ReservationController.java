@@ -5,6 +5,7 @@ import com.resourcebooking.dto.ReservationResponse;
 import com.resourcebooking.dto.ReservationStatusUpdateRequest;
 import com.resourcebooking.entity.User;
 import com.resourcebooking.enums.ReservationStatus;
+import com.resourcebooking.enums.Role;
 import com.resourcebooking.service.ReservationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -74,6 +75,8 @@ public class ReservationController {
     }
 
     private boolean isAdmin(User user) {
-        return user.getRole().name().equals("ADMIN");
+        // security config already blocks unauthenticated requests from reaching here, but
+        // checking null anyway rather than trusting that path always holds
+        return user != null && user.getRole() == Role.ADMIN;
     }
 }

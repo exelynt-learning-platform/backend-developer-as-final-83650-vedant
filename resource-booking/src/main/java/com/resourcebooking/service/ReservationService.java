@@ -17,9 +17,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Service
 public class ReservationService {
+
+    // only these columns are allowed in ?sortBy= - anything else would either blow up with a
+    // PropertyReferenceException (500) or let someone probe the entity's field names
+    private static final Set<String> ALLOWED_SORT_FIELDS = Set.of(
+            "createdAt", "startTime", "endTime", "price", "status"
+    );
 
     private final ReservationRepository reservationRepository;
     private final ResourceService resourceService;
@@ -33,6 +40,16 @@ public class ReservationService {
     // in the controller, never trust an id sent in the request body)
     public ReservationResponse create(ReservationRequest request, User currentUser) {
         Resource resource = resourceService.findOrThrow(request.getResourceId());
+
+        // block double-booking - is there already a non-cancelled reservation on this
+        // resource that overlaps the requested time range?
+        boolean overlaps = !reservationRepository.findOverlapping(
+                request.getResourceId(), request.getStartTime(), request.getEndTime()
+        ).isEmpty();
+
+        if (overlaps) {
+            throw new IllegalArgumentException("This resource is already booked for the requested time slot");
+        }
 
         Reservation reservation = new Reservation();
         reservation.setResource(resource);
@@ -51,6 +68,15 @@ public class ReservationService {
                                                        ReservationStatus status, BigDecimal minPrice,
                                                        BigDecimal maxPrice, int page, int size,
                                                        String sortBy, String sortDir) {
+
+        if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
+            throw new IllegalArgumentException(
+                    "sortBy must be one of " + ALLOWED_SORT_FIELDS + " (got '" + sortBy + "')");
+        }
+
+        if (!sortDir.equalsIgnoreCase("asc") && !sortDir.equalsIgnoreCase("desc")) {
+            throw new IllegalArgumentException("sortDir must be 'asc' or 'desc' (got '" + sortDir + "')");
+        }
 
         Sort sort = sortDir.equalsIgnoreCase("desc")
                 ? Sort.by(sortBy).descending()

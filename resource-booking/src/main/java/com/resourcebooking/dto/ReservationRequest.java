@@ -1,5 +1,6 @@
 package com.resourcebooking.dto;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -26,4 +27,14 @@ public class ReservationRequest {
     @NotNull(message = "price is required")
     @DecimalMin(value = "0.0", inclusive = true, message = "price can't be negative")
     private BigDecimal price;
+
+    // cross-field check - bean validation runs this automatically because of the "is" prefix.
+    // skips the check if either field is null since @NotNull above already flags that separately
+    @AssertTrue(message = "endTime must be after startTime")
+    public boolean isEndTimeAfterStartTime() {
+        if (startTime == null || endTime == null) {
+            return true;
+        }
+        return endTime.isAfter(startTime);
+    }
 }
