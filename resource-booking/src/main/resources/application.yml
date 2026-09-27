@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: resource-booking-system
+
+  datasource:
+    # switch driver-class-name + url below if you want postgres instead of mysql
+    url: ${DB_URL:jdbc:mysql://localhost:3306/resource_booking_db}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
+
+  jpa:
+    hibernate:
+      # update is fine for dev, don't use in real prod
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: ${DB_DIALECT:org.hibernate.dialect.MySQLDialect}
+
+# put a long random string here in real deployments, don't commit real secrets
+jwt:
+  secret: ${JWT_SECRET:this-is-a-super-secret-jwt-key-change-it-before-deploying-1234567890}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}   # 24 hours
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
